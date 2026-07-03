@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SDG 16 - 디지털 평화 앱 와이어프레임</title>
+<style>
+  /* 기본 리셋 및 폰트 */
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', 'Malgun Gothic', sans-serif; }
+  body { background-color: #f4f6f9; display: flex; justify-content: center; align-items: center; height: 100vh; }
+  
+  /* 모바일 디바이스 프레임 */
+  #app-frame {
+    width: 360px;
+    height: 640px;
+    background-color: #ffffff;
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* 상단 상태바 (가짜) */
+  .status-bar { height: 24px; background: #e0e0e0; display: flex; justify-content: center; align-items: center; font-size: 10px; color: #666; }
+
+  /* 헤더 */
+  header { padding: 16px; background-color: #4A90E2; color: white; text-align: center; font-weight: bold; font-size: 18px; display: flex; justify-content: space-between; align-items: center;}
+  .home-btn { background: none; border: none; color: white; font-size: 14px; cursor: pointer; text-decoration: underline; }
+
+  /* 화면 전환용 컨테이너 */
+  .screen { display: none; padding: 20px; flex: 1; flex-direction: column; gap: 16px; overflow-y: auto; }
+  .screen.active { display: flex; }
+
+  /* 공통 버튼 스타일 */
+  button { padding: 16px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+  button:active { transform: scale(0.98); }
+
+  /* 화면1: 모드 선택 화면 */
+  #screen-intro { justify-content: center; text-align: center; }
+  #screen-intro h2 { margin-bottom: 24px; font-size: 20px; color: #333; }
+  .btn-mode-general { background-color: #4A90E2; color: white; font-size: 16px; }
+  .btn-mode-elderly { background-color: #F5A623; color: white; font-size: 20px; padding: 24px; } /* 어르신용은 더 크고 눈에 띄게 */
+
+  /* 화면2: 일반/학생 화면 */
+  #screen-general .btn-action { background-color: #f0f4f8; color: #333; font-size: 16px; text-align: left; display: flex; align-items: center; gap: 12px; border: 1px solid #dcdcdc; }
+  #screen-general .btn-action span { font-size: 24px; }
+
+  /* 화면3: 어르신(쉬운) 화면 */
+  #screen-elderly { background-color: #FFFDF7; }
+  #screen-elderly .btn-giant { background-color: #E74C3C; color: white; font-size: 24px; padding: 40px 20px; text-align: center; border-radius: 20px; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+  #screen-elderly .btn-large { background-color: #2ECC71; color: white; font-size: 20px; padding: 24px; text-align: center; }
+
+  /* 화면4: 상세 화면 (가짜뉴스/신고 등 공통 사용) */
+  #screen-detail { background-color: #fff; text-align: center; justify-content: center; }
+  #detail-title { font-size: 20px; margin-bottom: 20px; }
+  .btn-back { background-color: #ddd; color: #333; padding: 12px; }
+
+</style>
+</head>
+<body>
+
+<div id="app-frame">
+  <div class="status-bar">9:41 AM</div>
+  <header>
+    <span id="header-title">디지털 평화</span>
+    <button class="home-btn" onclick="navTo('screen-intro')">처음으로</button>
+  </header>
+
+  <div id="screen-intro" class="screen active">
+    <h2>나에게 맞는 화면을<br>선택해 주세요</h2>
+    <button class="btn-mode-general" onclick="navTo('screen-general')">일반 / 학생 화면<br><small>(상세한 기능)</small></button>
+    <button class="btn-mode-elderly" onclick="navTo('screen-elderly')">쉬운 화면<br><small>(큰 글씨, 간편 신고)</small></button>
+  </div>
+
+  <div id="screen-general" class="screen">
+    <h3 style="color:#4A90E2;">안녕하세요! 무엇을 도와드릴까요?</h3>
+    <button class="btn-action" onclick="showDetail('🧐 이거 진짜야?', '링크나 이미지를 넣어 가짜뉴스인지 판별합니다.')">
+      <span>🧐</span> 이거 진짜야? (가짜뉴스 확인)
+    </button>
+    <button class="btn-action" onclick="showDetail('🚨 피해 신고하기', '사이버 불링, 루머 등의 피해를 신고하는 양식입니다.')">
+      <span>🚨</span> 피해 신고하기
+    </button>
+    <button class="btn-action" onclick="showDetail('📋 어떻게 진행중?', '내가 신고한 내역의 처리 상태를 보여줍니다.')">
+      <span>📋</span> 어떻게 진행중?
+    </button>
+  </div>
+
+  <div id="screen-elderly" class="screen">
+    <h3 style="font-size: 22px; text-align: center; margin-bottom: 10px;">무엇을 도와드릴까요?</h3>
+    <button class="btn-giant" onclick="showDetail('🎤 말하기 / 간편신고', '음성 인식 중입니다... 억울한 일을 말씀해 주세요.')">
+      <span>🎙️</span>
+      말하기 / 간편신고
+    </button>
+    <button class="btn-large" onclick="showDetail('🔍 어떻게 진행중?', '신고하신 내용이 경찰서에 접수되었습니다.')">
+      어떻게 진행중?
+    </button>
+  </div>
+
+  <div id="screen-detail" class="screen">
+    <h2 id="detail-title">상세화면</h2>
+    <p id="detail-desc" style="color: #666; margin-bottom: 30px;">설명</p>
+    <button class="btn-back" onclick="goBack()">이전 화면으로 돌아가기</button>
+  </div>
+
+</div>
+
+<script>
+  // 화면 이동 로직
+  let previousScreen = 'screen-intro';
+
+  function navTo(screenId) {
+    // 모든 화면 숨기기
+    document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+    // 선택한 화면 보이기
+    document.getElementById(screenId).classList.add('active');
+  }
+
+  function showDetail(title, desc) {
+    // 현재 활성화된 화면을 이전 화면으로 저장
+    const currentActive = document.querySelector('.screen.active');
+    if(currentActive && currentActive.id !== 'screen-detail') {
+      previousScreen = currentActive.id;
+    }
+    
+    // 상세 화면 내용 업데이트
+    document.getElementById('detail-title').innerText = title;
+    document.getElementById('detail-desc').innerText = desc;
+    
+    navTo('screen-detail');
+  }
+
+  function goBack() {
+    navTo(previousScreen);
+  }
+</script>
+
+</body>
+</html>
